@@ -7,8 +7,11 @@ import type { Job } from "./Types";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 
-// LocalStorage key used for persistent browser storage of job items
+// localStorage key used for persistent browser storage of job items
 const STORAGE_KEY = "job-board-data";
+
+// helper function to generate a default/empty job object for the form state.
+   //omits the 'id' field since IDs are generated upon final submission.
 
 const createEmptyJob = (): Omit<Job, "id"> => ({
   company: "",
@@ -24,6 +27,10 @@ const createEmptyJob = (): Omit<Job, "id"> => ({
   languages: [],
 });
 
+
+ //retrieves the initial list of jobs.
+ // attempts to load saved data from LocalStorage; falls back to the static JSON file if LocalStorage is empty or contains malformed JSON data.
+
 const getInitialJobs = (): Job[] => {
   const savedJobs = localStorage.getItem(STORAGE_KEY);
 
@@ -31,27 +38,41 @@ const getInitialJobs = (): Job[] => {
     try {
       return JSON.parse(savedJobs) as Job[];
     } catch {
+       // fallback if parsing saved data fails
       return jobsData as Job[];
     }
   }
-
+      // default fallback if no data exists in localStorage
   return jobsData as Job[];
 };
+
+// component responsible for rendering the filtered list of job cards.
+
+// subscribes to FilterContext to match jobs against active user filters.
 
 const JobList: React.FC<{
   jobs: Job[];
   onEdit: (job: Job) => void;
   onDelete: (id: number) => void;
 }> = ({ jobs, onEdit, onDelete }) => {
+
+  // extract active filter tags from global Context
   const { filters } = useContext(FilterContext);
+
+  //determines if a job matches all currently selected filters and  Consolidates role, level, and languages into a single tags array.
 
   const filterJob = (job: Job) => {
     const tags = [job.role, job.level, ...job.languages];
+
+    // ensures every active filter tag is present in the job's tags
     return filters.every((filter) => tags.includes(filter));
   };
 
   return (
     <div className="mt-6 space-y-4">
+
+      {/* filters the jobs array first, then maps each remaining job to a JobCard component */}
+
       {jobs.filter(filterJob).map((job) => (
         <JobCard key={job.id} job={job} onEdit={onEdit} onDelete={onDelete} />
       ))}
@@ -59,15 +80,20 @@ const JobList: React.FC<{
   );
 };
 
+// main application component and manages core state including the job list, modal visibility, form data, and localStorage sync.
+
 const App: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>(getInitialJobs);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Omit<Job, "id">>(createEmptyJob());
 
+  // Automatically synchronize local storage whenever the jobs list changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
   }, [jobs]);
+
+  // resets form state and opens the modal to add a new job.
 
   const openAddModal = () => {
     setEditingId(null);

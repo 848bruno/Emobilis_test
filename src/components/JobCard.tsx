@@ -8,6 +8,8 @@ interface JobCardProps {
   onEdit: (job: Job) => void;
   onDelete: (id: number) => void;
 }
+ 
+// Displays individual job listing details, selectable metadata tags,
 
 const JobCard: React.FC<JobCardProps> = ({ job, onEdit, onDelete }) => {
   const { addFilter } = React.useContext(FilterContext);

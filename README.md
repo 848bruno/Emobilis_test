@@ -1,54 +1,87 @@
-# React + TypeScript + Vite
+# Job Board App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple React + TypeScript job listing app for browsing, filtering, adding, editing, and deleting job posts. The app uses browser local storage to persist job data between refreshes.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Browse a list of job cards
+- Filter jobs by tags such as role, level, and technologies
+- Add a new job using a popup form
+- Edit any existing job
+- Delete jobs from the card list
+- Data persistence with localStorage
+- Responsive layout for desktop and mobile
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Project Structure
+
+```bash
+src/
+├── App.tsx
+├── components/
+│   ├── FilterBar.tsx
+│   ├── Footer.tsx
+│   ├── Header.tsx
+│   └── JobCard.tsx
+├── context/
+│   └── FilterContext.tsx
+├── data/
+│   └── jobs.json
+├── Types/
+│   └── index.ts
+├── index.css
+├── main.tsx
+└── vite-env.d.ts
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Install dependencies
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm install
 ```
+
+or
+
+```bash
+pnpm install
+```
+
+### Run the app
+
+```bash
+npm run dev
+```
+
+or
+
+```bash
+pnpm dev
+```
+
+### Build for production
+
+```bash
+npm run build
+```
+
+or
+
+```bash
+pnpm build
+```
+
+## Notes
+
+This version uses localStorage instead of a backend, which makes it easy to run and test without extra setup. For a production-ready app, the next step would be connecting it to a real database or API.
+
+## License
+
+This project is intended for learning and demo purposes.

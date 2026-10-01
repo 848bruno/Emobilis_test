@@ -10,8 +10,8 @@ import Header from "./components/Header";
 // localStorage key used for persistent browser storage of job items
 const STORAGE_KEY = "job-board-data";
 
-// helper function to generate a default/empty job object for the form state.
-   //omits the 'id' field since IDs are generated upon final submission.
+// helper function to generate a default/empty job object for the form state
+   //omits the 'id' field since IDs are generated upon final submission
 
 const createEmptyJob = (): Omit<Job, "id"> => ({
   company: "",
@@ -28,8 +28,8 @@ const createEmptyJob = (): Omit<Job, "id"> => ({
 });
 
 
- //retrieves the initial list of jobs.
- // attempts to load saved data from LocalStorage; falls back to the static JSON file if LocalStorage is empty or contains malformed JSON data.
+ //retrieves the initial list of jobs
+ // attempts to load saved data from LocalStorage; falls back to the static JSON file if LocalStorage is empty or contains malformed JSON data
 
 const getInitialJobs = (): Job[] => {
   const savedJobs = localStorage.getItem(STORAGE_KEY);
@@ -46,9 +46,9 @@ const getInitialJobs = (): Job[] => {
   return jobsData as Job[];
 };
 
-// component responsible for rendering the filtered list of job cards.
+// component responsible for rendering the filtered list of job cards
 
-// subscribes to FilterContext to match jobs against active user filters.
+// subscribes to FilterContext to match jobs against active user filters
 
 const JobList: React.FC<{
   jobs: Job[];
@@ -59,7 +59,7 @@ const JobList: React.FC<{
   // extract active filter tags from global Context
   const { filters } = useContext(FilterContext);
 
-  //determines if a job matches all currently selected filters and  Consolidates role, level, and languages into a single tags array.
+  //determines if a job matches all currently selected filters and  Consolidates role, level, and languages into a single tags array
 
   const filterJob = (job: Job) => {
     const tags = [job.role, job.level, ...job.languages];
@@ -80,7 +80,7 @@ const JobList: React.FC<{
   );
 };
 
-// main application component and manages core state including the job list, modal visibility, form data, and localStorage sync.
+// main application component and manages core state including the job list, modal visibility, form data, and localStorage sync
 
 const App: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>(getInitialJobs);
@@ -93,13 +93,15 @@ const App: React.FC = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
   }, [jobs]);
 
-  // resets form state and opens the modal to add a new job.
+  // resets form state and opens the modal to add a new job
 
   const openAddModal = () => {
     setEditingId(null);
     setFormData(createEmptyJob());
     setIsModalOpen(true);
   };
+  
+// populates form state with an existing job's data and opens the modal for editing
 
   const openEditModal = (job: Job) => {
     setEditingId(job.id);
@@ -118,6 +120,8 @@ const App: React.FC = () => {
     });
     setIsModalOpen(true);
   };
+ 
+  // Closes the modal and resets the form to its initial blank state
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -125,6 +129,8 @@ const App: React.FC = () => {
     setFormData(createEmptyJob());
   };
 
+  // generic input handler for standard form inputs, select dropdowns, and checkboxes
+   
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -138,6 +144,8 @@ const App: React.FC = () => {
     }));
   };
 
+  // handles comma-separated values input for job languages and  parsing the string into a clean array of strings
+
   const handleLanguagesChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -148,16 +156,23 @@ const App: React.FC = () => {
     }));
   };
 
+   // handles form submission for both creating a new job and editing an existing job
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+
+    // // clean  string inputs
 
     const company = formData.company.trim();
     const position = formData.position.trim();
     const location = formData.location.trim();
 
+    // prevent submission if required text fields are empty
+
     if (!company || !position || !location) {
       return;
     }
+
+    // prepare cleaned payload with defaults if optional values are omitted
 
     const cleanedJob: Omit<Job, "id"> = {
       ...formData,
@@ -170,6 +185,8 @@ const App: React.FC = () => {
         : ["JavaScript"],
     };
 
+    // Update existing job entry
+
     if (editingId !== null) {
       setJobs((currentJobs) =>
         currentJobs.map((job) =>
@@ -177,6 +194,9 @@ const App: React.FC = () => {
         ),
       );
     } else {
+
+      // add new job entry to the beginning of the list with a unique ID
+
       setJobs((currentJobs) => [
         {
           ...cleanedJob,
@@ -189,13 +209,20 @@ const App: React.FC = () => {
     closeModal();
   };
 
+  //removes a job entry by its unique ID
+
   const handleDelete = (id: number) => {
     setJobs((currentJobs) => currentJobs.filter((job) => job.id !== id));
   };
 
   return (
+
+    /* wraps application in filterProvider context for global filter management */
+
     <FilterProvider>
       <Header />
+
+      {/* main Container */}
 
       <div className="min-h-screen bg-slate-100 p-4 md:p-6">
         <div className="mx-auto max-w-5xl">
@@ -216,10 +243,17 @@ const App: React.FC = () => {
             </button>
           </div>
 
+          {/* interactive filter control bar */}
+
           <FilterBar />
+
+          {/* filtered job listings list */}
+
           <JobList jobs={jobs} onEdit={openEditModal} onDelete={handleDelete} />
         </div>
       </div>
+
+      {/* modal overlay for creating / editing Jobs */}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -237,6 +271,8 @@ const App: React.FC = () => {
               </button>
             </div>
 
+            {/* modal Form */}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="text-sm font-medium text-gray-700">
@@ -251,6 +287,8 @@ const App: React.FC = () => {
                   />
                 </label>
 
+                {/* position Field */}
+
                 <label className="text-sm font-medium text-gray-700">
                   Position
                   <input
@@ -263,6 +301,8 @@ const App: React.FC = () => {
                   />
                 </label>
 
+                {/* location Field */}
+
                 <label className="text-sm font-medium text-gray-700">
                   Location
                   <input
@@ -274,6 +314,8 @@ const App: React.FC = () => {
                     placeholder="Remote"
                   />
                 </label>
+
+                {/* contract Type Selection */}
 
                 <label className="text-sm font-medium text-gray-700">
                   Contract
@@ -290,6 +332,8 @@ const App: React.FC = () => {
                   </select>
                 </label>
 
+                {/* role Category Selection */}
+
                 <label className="text-sm font-medium text-gray-700">
                   Role
                   <select
@@ -303,6 +347,8 @@ const App: React.FC = () => {
                     <option value="Fullstack">Fullstack</option>
                   </select>
                 </label>
+
+                {/* experience level selection */}
 
                 <label className="text-sm font-medium text-gray-700">
                   Level
@@ -318,6 +364,7 @@ const App: React.FC = () => {
                   </select>
                 </label>
               </div>
+              {/* languages field  */}
 
               <label className="block text-sm font-medium text-gray-700">
                 Languages
@@ -331,6 +378,8 @@ const App: React.FC = () => {
                   placeholder="React, TypeScript, Node"
                 />
               </label>
+
+              {/* checkboxes for 'New' and 'Featured' status tags */}
 
               <div className="flex items-center gap-6 text-sm text-gray-700">
                 <label className="flex items-center gap-2">
@@ -353,6 +402,8 @@ const App: React.FC = () => {
                 </label>
               </div>
 
+              {/* action buttons */}
+
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
@@ -372,6 +423,7 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
+      {/* footer section */}
 
       <div className="text-center text-gray-500 text-sm mt-10">
         <Footer />
